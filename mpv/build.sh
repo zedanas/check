@@ -1,0 +1,142 @@
+pkgname=('mpv')
+pkgver=0.32.0
+pkgrel=2
+epoch=1
+pkgdesc='A free, open source, and cross-platform media player'
+url='https://mpv.io/'
+license=('GPL3')
+arch=('x86_64')
+depends=(
+'alsa-lib'
+'desktop-file-utils'
+'glibc'
+'hicolor-icon-theme'
+'lcms2'
+'libarchive'
+'libass'
+'libavcodec.so'
+'libavdevice.so'
+'libavutil.so'
+'libdrm'
+'libegl'
+'libgl'
+'libjpeg-turbo'
+'libpulse'
+'libva-drm.so'
+'libva-x11.so'
+'libva.so'
+'libx11'
+'libxext'
+'libxinerama'
+'libxkbcommon'
+'libxrandr'
+'libxss'
+'libxv'
+'mesa'
+'zlib'
+)
+makedepends=(
+'ffnvcodec-headers'
+'ladspa'
+'python-docutils'
+'vulkan-headers'
+'waf'
+'wayland-protocols'
+'xdg-utils'
+)
+optdepends=('youtube-dl: for video-sharing websites playback')
+provides=('libmpv.so')
+backup=(
+'etc/mpv/input.conf'
+'etc/mpv/mpv.conf'
+)
+source=("$pkgname-$pkgver.tar.gz::https://github.com/mpv-player/$pkgname/archive/v$pkgver.tar.gz")
+sha256sums=('9163f64832226d22e24bbc4874ebd6ac02372cd717bef15c28a0aa858c5fe592')
+build() {
+cd $pkgname-$pkgver
+config_opts=(
+	'--prefix=/usr'
+	'--bindir=/usr/bin'
+	'--libdir=/usr/lib'
+	'--sysconfdir=/etc'
+	'--confdir=/etc/mpv'
+	'--disable-lgpl'
+	'--disable-static-build'
+	'--disable-libmpv-static'
+	'--enable-libmpv-shared'
+	'--disable-debug-build'
+	'--disable-tests'
+	'--disable-html-build'
+	'--disable-pdf-build'
+	'--enable-manpage-build'
+	'--enable-cplugins'
+	'--enable-iconv'
+	'--enable-plain-gl'
+	'--disable-dvbin'
+	'--disable-opensles'
+	'--disable-oss-audio'
+	'--disable-ffmpeg-strict-abi'
+	'--enable-alsa'
+	'--disable-gl-wayland'
+	'--disable-jack'
+	'--enable-lcms2'
+	'--enable-libarchive'
+	'--enable-libass'
+	'--enable-libass-osd'
+	'--enable-libavdevice'
+	'--enable-drmprime'
+	'--disable-libbluray'
+	'--disable-caca'
+	'--disable-cdda'
+	'--enable-drm'
+	'--disable-dvdnav'
+	'--enable-egl'
+	'--enable-gl'
+	'--enable-jpeg'
+	'--disable-libplacebo'
+	'--enable-pulse'
+	'--enable-vaapi'
+	'--enable-vaapi-drm'
+	'--disable-vaapi-wayland'
+	'--enable-vaapi-x11'
+	'--enable-vaapi-x-egl'
+	'--disable-vdpau'
+	'--disable-vdpau-gl-x11'
+	'--enable-egl-x11'
+	'--enable-gl-x11'
+	'--enable-x11'
+	'--enable-xv'
+	'--disable-lua'
+	'--enable-gbm'
+	'--enable-egl-drm'
+	'--disable-javascript'
+	'--disable-openal'
+	'--disable-rsound'
+	'--disable-rubberband'
+	'--disable-sdl2'
+	'--disable-sdl2-audio'
+	'--disable-sdl2-video'
+	'--disable-sdl2-gamepad'
+	'--disable-shaderc'
+	'--disable-spirv-cross'
+	'--disable-libsmbclient'
+	'--disable-sndio'
+	'--disable-uchardet'
+	'--disable-vapoursynth'
+	'--disable-vulkan'
+	'--disable-wayland'
+	'--disable-wayland-protocols'
+	'--disable-wayland-scanner'
+	'--disable-zimg'
+	'--enable-zlib'
+)
+waf configure ${config_opts[@]}
+waf build
+}
+package() {
+cd $pkgname-$pkgver
+waf install --destdir=$pkgdir
+install -Dm644 etc/mpv.conf $pkgdir/etc/mpv/mpv.conf
+install -Dm644 etc/input.conf $pkgdir/etc/mpv/input.conf
+install -m644 DOCS/{encoding.rst,tech-overview.txt} $pkgdir/usr/share/doc/mpv
+}
